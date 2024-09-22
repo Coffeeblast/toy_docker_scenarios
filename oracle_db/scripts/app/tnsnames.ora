@@ -1,0 +1,7 @@
+freepdb1_alias =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = tcp)(HOST = oracle_Db)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVICE_NAME = FREEPDB1)
+    )
+  )

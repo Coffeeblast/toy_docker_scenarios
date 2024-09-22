@@ -1,0 +1,19 @@
+FROM ssh_base:latest
+
+SHELL ["/bin/bash", "-c"]
+
+# installing ssh client
+RUN apt-get update && apt-get install -y openssh-client
+
+# setting up a non-root user
+ARG USR="usr_client"
+ARG PASS="client_password"
+
+RUN useradd ${USR} -p $(openssl passwd -6 $PASS) --create-home -s /bin/bash
+
+# append USR into sudo group
+RUN usermod -aG sudo ${USR}
+USER ${USR}
+
+
+ENTRYPOINT [ "tail", "-f", "/dev/null" ]

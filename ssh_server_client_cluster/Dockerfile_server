@@ -1,0 +1,28 @@
+FROM ssh_base:latest
+
+# sets shell for RUN directives
+SHELL ["/bin/bash", "-c"]
+
+# installing ssh server
+RUN apt-get update && apt-get install -y openssh-server
+
+# creates a backup of unmodified sshd_config and sets it unwritable
+RUN cp /etc/ssh/sshd_config /etc/ssh/sshd_config.original && chmod a-w /etc/ssh/sshd_config.original
+
+RUN mkdir -p /run/sshd
+RUN mkdir /scripts
+COPY ./scripts/ssh_server_entrypoint.sh /scripts/ssh_server_entrypoint.sh
+RUN chmod u+x /scripts/ssh_server_entrypoint.sh
+
+# setting up a non-root user ... we will login into ssh_server via ssh as this user
+ARG USR="usr_server"
+ARG PASS="server_password"
+
+RUN useradd ${USR} -p $(openssl passwd -6 $PASS) --create-home -s /bin/bash
+
+# append USR into sudo group
+RUN usermod -aG sudo ${USR}
+#USER ${USR}
+
+#  We will run sshd as root to avoid issues
+ENTRYPOINT [ "/scripts/ssh_server_entrypoint.sh" ]

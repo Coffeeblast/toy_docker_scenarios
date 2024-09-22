@@ -1,0 +1,39 @@
+services:
+  # dummy image ssh_server and ssh_client "inherit" from it. Needs to be built first
+  ssh_base:
+    build:
+      context: .
+      dockerfile: Dockerfile_base
+      network: host
+    network_mode: none
+    image: ssh_base:latest
+    # Prevent the service from running by overriding the command
+    command: ["echo", "Base image built, not running."]
+    # Don't start this service automatically
+    deploy:
+      replicas: 0
+  ssh_server:
+    build: 
+      context: .
+      dockerfile: Dockerfile_server
+      network: host
+    image: ssh_server:latest
+    container_name: ssh_server
+    depends_on:
+      - ssh_base
+    networks:
+      - ssh_network
+  ssh_client:
+    build: 
+      context: .
+      dockerfile: Dockerfile_client
+      network: host
+    image: ssh_client:latest
+    container_name: ssh_client
+    depends_on:
+      - ssh_base
+    networks:
+      - ssh_network
+networks:
+  ssh_network: 
+    name: ssh_network

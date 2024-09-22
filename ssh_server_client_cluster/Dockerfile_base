@@ -1,0 +1,4 @@
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get upgrade
+RUN apt-get install -y nmap net-tools iputils-ping python3 sudo passwd openssl dnsutils nano

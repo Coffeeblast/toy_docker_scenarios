@@ -1,0 +1,37 @@
+services:
+  oracle_db:
+    build: 
+      context: .
+      dockerfile: Dockerfile_db
+      network: host
+    image: "coffeeblast/oracle_db_img:latest"
+    ports: 
+      - "1521:1521"
+    environment:
+      ORACLE_PASSWORD: oracle_root_password
+      APP_USER: app_user
+      APP_USER_PASSWORD: app_user_password
+    container_name: oracle_db
+    networks: 
+      - oracle_db_network
+    volumes:
+      - oracle_db_volume:/opt/oracle/oradata:rw
+  oracle_db_app:
+    container_name: oracle_db_app
+    build: 
+      context: .
+      dockerfile: Dockerfile_app
+      network: host
+    image: "coffeeblast/oracle_db_app_img:latest"
+    networks: 
+      - oracle_db_network
+    volumes:
+      - "./scripts/app:/scripts/app:ro"
+
+networks:
+  oracle_db_network:
+    name: oracle_db_network
+
+volumes:
+  oracle_db_volume:
+    name: oracle_db_volume
