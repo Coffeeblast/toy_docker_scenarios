@@ -1,0 +1,68 @@
+services:
+  # image just for using as base for other images, not actually run
+  ubuntu_base:
+    build: 
+      context: ./ubuntu_base
+      dockerfile: Dockerfile_ubuntuBase
+      network: host
+    image: "coffeeblast/spark_cluster_ubuntu_base_img:latest"
+    # so that docker compose does not create default network
+    network_mode: none
+    deploy:
+      replicas: 0
+
+  spark_master:
+    container_name: spark_master
+    depends_on:
+      - ubuntu_base
+    build: 
+      context: ./spark
+      dockerfile: Dockerfile_sparkBase
+      network: host
+      args:
+        - SPARK_HOME=$SPARK_HOME
+        - DOWNLOADS_ROOT=$DOWNLOADS_ROOT
+        - UNPACK_ROOT=$UNPACK_ROOT
+        - INSTALL_ROOT=$INSTALL_ROOT
+        - HOST_DOWNLOADS_FOLDER=$HOST_DOWNLOADS_FOLDER
+        - HOST_INSTALL_FOLDER=$HOST_INSTALL_FOLDER
+        - SPARK_ARCHIVE=$SPARK_ARCHIVE
+        - SPARK_UNPACK_SUBPATH=$SPARK_UNPACK_SUBPATH
+    image: "coffeeblast/spark_base_img:latest"
+    networks: 
+      - spark_cluster_network
+    ports:
+      # spark web ui port
+      - "8080:8080"
+    entrypoint: ["/bin/bash", "-c", "${SPARK_HOME}/sbin/start-master.sh && tail -f /dev/null" ]
+
+  hadoop:
+    container_name: hadoop
+    depends_on:
+      - ubuntu_base
+    build: 
+      context: ./hadoop
+      dockerfile: Dockerfile_hadoop_single_node_cluster
+      network: host
+      args:
+        - JAVA_HOME=$JAVA_HOME
+        - HADOOP_HOME=$HADOOP_HOME
+        - DOWNLOADS_ROOT=$DOWNLOADS_ROOT
+        - UNPACK_ROOT=$UNPACK_ROOT
+        - INSTALL_ROOT=$INSTALL_ROOT
+        - HOST_DOWNLOADS_FOLDER=$HOST_DOWNLOADS_FOLDER
+        - HOST_INSTALL_FOLDER=$HOST_INSTALL_FOLDER
+        - HADOOP_ARCHIVE=$HADOOP_ARCHIVE
+        - HADOOP_UNPACK_SUBPATH=$HADOOP_UNPACK_SUBPATH
+        - HDFS_GROUP=$HDFS_GROUP
+    image: "coffeeblast/hadoop_single_node_cluster_img:latest"
+    ports:
+      - "9870:9870" # namenode web interface
+    networks: 
+      - spark_cluster_network
+    entrypoint: ["/bin/bash", "-c", "/usr/sbin/sshd && sbin/start-dfs.sh && tail -f /dev/null" ]
+    #entrypoint: ["/bin/bash", "-c", "/usr/sbin/sshd && tail -f /dev/null" ]
+
+networks:
+  spark_cluster_network:
+    name: spark_cluster_network

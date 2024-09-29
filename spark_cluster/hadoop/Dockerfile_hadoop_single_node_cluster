@@ -1,0 +1,66 @@
+# see https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/SingleCluster.html
+
+ARG DOWNLOADS_ROOT
+ARG UNPACK_ROOT
+ARG INSTALL_ROOT
+ARG HOST_DOWNLOADS_FOLDER
+ARG HOST_INSTALL_FOLDER
+ARG HADOOP_ARCHIVE
+ARG HADOOP_UNPACK_SUBPATH
+ARG HDFS_GROUP
+
+FROM coffeeblast/spark_cluster_ubuntu_base_img:latest AS build_container
+
+ARG DOWNLOADS_ROOT
+ARG UNPACK_ROOT
+ARG INSTALL_ROOT
+ARG HOST_DOWNLOADS_FOLDER
+ARG HOST_INSTALL_FOLDER
+ARG HADOOP_ARCHIVE
+
+ENV DOWNLOADS_ROOT=${DOWNLOADS_ROOT}
+ENV HADOOP_ARCHIVE=${HADOOP_ARCHIVE}
+ENV UNPACK_ROOT=${UNPACK_ROOT}
+
+RUN mkdir ${DOWNLOADS_ROOT} ${UNPACK_ROOT} ${INSTALL_ROOT}
+COPY ${HOST_INSTALL_FOLDER}/prepare_files.sh ${INSTALL_ROOT}
+COPY ${HOST_DOWNLOADS_FOLDER}/* ${DOWNLOADS_ROOT}
+RUN chmod +x ${INSTALL_ROOT}prepare_files.sh && ${INSTALL_ROOT}prepare_files.sh
+
+FROM coffeeblast/spark_cluster_ubuntu_base_img:latest as production
+
+RUN apt-get install -y ssh pdsh
+
+ARG JAVA_HOME
+ARG HADOOP_HOME
+ARG UNPACK_ROOT
+ARG HADOOP_UNPACK_SUBPATH
+ARG INSTALL_ROOT
+ARG HOST_INSTALL_FOLDER
+
+ENV JAVA_HOME=${JAVA_HOME}
+ENV HADOOP_HOME=${HADOOP_HOME}
+WORKDIR ${HADOOP_HOME}
+
+COPY --from=build_container ${UNPACK_ROOT}${HADOOP_UNPACK_SUBPATH} .
+RUN echo $(pwd)
+RUN cp etc/hadoop/core-site.xml etc/hadoop/core-site.orig.xml && \
+    cp etc/hadoop/hdfs-site.xml etc/hadoop/hdfs-site.orig.xml && \
+    cp etc/hadoop/hadoop-env.sh etc/hadoop/hadoop-env.orig.sh
+COPY etc/* etc/hadoop
+
+# if this is not created here, then formatting script creates it incorrectly
+# with wrong group for our usecase (since we have 3 different users for namenode
+# secondary namenode and datanode)
+RUN mkdir ${HADOOP_HOME}/logs
+
+ARG HDFS_GROUP
+ENV HDFS_GROUP=${HDFS_GROUP}
+RUN groupadd $HDFS_GROUP && chown -R :$HDFS_GROUP $HADOOP_HOME
+
+# copy user rwx status to group
+RUN find ${HADOOP_HOME} -exec chmod g=u {} +
+
+RUN mkdir ${INSTALL_ROOT}
+COPY ${HOST_INSTALL_FOLDER}/setup.sh ${INSTALL_ROOT}
+RUN chmod +x ${INSTALL_ROOT}setup.sh && ${INSTALL_ROOT}setup.sh
