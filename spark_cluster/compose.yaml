@@ -57,11 +57,13 @@ services:
         - HDFS_GROUP=$HDFS_GROUP
     image: "coffeeblast/hadoop_single_node_cluster_img:latest"
     ports:
-      - "9870:9870" # namenode web interface
+      - "9870:9870" # namenode web interface (hadoop)
+      - "8088:8088" # resource manager web interface (yarn) 
     networks: 
       - spark_cluster_network
-    entrypoint: ["/bin/bash", "-c", "/usr/sbin/sshd && sbin/start-dfs.sh && tail -f /dev/null" ]
+    #entrypoint: ["/bin/bash", "-c", "/usr/sbin/sshd && sbin/start-dfs.sh && tail -f /dev/null" ]
     #entrypoint: ["/bin/bash", "-c", "/usr/sbin/sshd && tail -f /dev/null" ]
+    entrypoint: ["/scripts/admin/startup.sh"]
 
 networks:
   spark_cluster_network:

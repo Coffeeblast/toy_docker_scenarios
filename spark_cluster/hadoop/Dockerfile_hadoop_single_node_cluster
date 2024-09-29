@@ -46,7 +46,10 @@ COPY --from=build_container ${UNPACK_ROOT}${HADOOP_UNPACK_SUBPATH} .
 RUN echo $(pwd)
 RUN cp etc/hadoop/core-site.xml etc/hadoop/core-site.orig.xml && \
     cp etc/hadoop/hdfs-site.xml etc/hadoop/hdfs-site.orig.xml && \
-    cp etc/hadoop/hadoop-env.sh etc/hadoop/hadoop-env.orig.sh
+    cp etc/hadoop/hadoop-env.sh etc/hadoop/hadoop-env.orig.sh && \
+    cp etc/hadoop/yarn-env.sh etc/hadoop/yarn-env.orig.sh && \
+    cp etc/hadoop/mapred-site.xml etc/hadoop/mapred-site.orig.xml && \
+    cp etc/hadoop/yarn-site.xml etc/hadoop/yarn-site.orig.xml
 COPY etc/* etc/hadoop
 
 # if this is not created here, then formatting script creates it incorrectly
@@ -62,5 +65,12 @@ RUN groupadd $HDFS_GROUP && chown -R :$HDFS_GROUP $HADOOP_HOME
 RUN find ${HADOOP_HOME} -exec chmod g=u {} +
 
 RUN mkdir ${INSTALL_ROOT}
-COPY ${HOST_INSTALL_FOLDER}/setup.sh ${INSTALL_ROOT}
-RUN chmod +x ${INSTALL_ROOT}setup.sh && ${INSTALL_ROOT}setup.sh
+COPY ${HOST_INSTALL_FOLDER}/setup_hadoop.sh ${INSTALL_ROOT}
+RUN chmod +x ${INSTALL_ROOT}setup_hadoop.sh && ${INSTALL_ROOT}setup_hadoop.sh
+
+COPY ${HOST_INSTALL_FOLDER}/setup_yarn.sh ${INSTALL_ROOT}
+RUN chmod +x ${INSTALL_ROOT}setup_yarn.sh && ${INSTALL_ROOT}setup_yarn.sh
+
+COPY ./scripts/admin/startup.sh /scripts/admin/startup.sh
+RUN chmod u+x /scripts/admin/startup.sh
+
