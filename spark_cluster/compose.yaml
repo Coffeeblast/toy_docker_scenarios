@@ -14,9 +14,11 @@ services:
   spark_master:
     container_name: spark_master
     depends_on:
-      - ubuntu_base
+      - hadoop
     build: 
       context: ./spark
+      additional_contexts:
+        - hadoop=./hadoop
       dockerfile: Dockerfile_sparkBase
       network: host
       args:
@@ -34,7 +36,9 @@ services:
     ports:
       # spark web ui port
       - "8080:8080"
-    entrypoint: ["/bin/bash", "-c", "${SPARK_HOME}/sbin/start-master.sh && tail -f /dev/null" ]
+    #entrypoint: ["/bin/bash", "-c", "${SPARK_HOME}/sbin/start-master.sh && tail -f /dev/null" ]
+    #entrypoint: ["/bin/bash", "-c", "tail -f /dev/null" ]
+    entrypoint: ["/scripts/admin/spark_master/startup.sh"]
 
   hadoop:
     container_name: hadoop
@@ -63,7 +67,7 @@ services:
       - spark_cluster_network
     #entrypoint: ["/bin/bash", "-c", "/usr/sbin/sshd && sbin/start-dfs.sh && tail -f /dev/null" ]
     #entrypoint: ["/bin/bash", "-c", "/usr/sbin/sshd && tail -f /dev/null" ]
-    entrypoint: ["/scripts/admin/startup.sh"]
+    entrypoint: ["/scripts/admin/hadoop/startup.sh"]
 
 networks:
   spark_cluster_network:

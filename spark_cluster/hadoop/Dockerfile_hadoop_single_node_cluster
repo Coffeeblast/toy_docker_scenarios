@@ -71,6 +71,6 @@ RUN chmod +x ${INSTALL_ROOT}setup_hadoop.sh && ${INSTALL_ROOT}setup_hadoop.sh
 COPY ${HOST_INSTALL_FOLDER}/setup_yarn.sh ${INSTALL_ROOT}
 RUN chmod +x ${INSTALL_ROOT}setup_yarn.sh && ${INSTALL_ROOT}setup_yarn.sh
 
-COPY ./scripts/admin/startup.sh /scripts/admin/startup.sh
-RUN chmod u+x /scripts/admin/startup.sh
+COPY ./scripts/admin/hadoop/startup.sh /scripts/admin/hadoop/startup.sh
+RUN chmod u+x /scripts/admin/hadoop/startup.sh
 
