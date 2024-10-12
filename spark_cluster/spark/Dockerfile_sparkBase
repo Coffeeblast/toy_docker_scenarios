@@ -37,7 +37,7 @@ RUN mkdir ${SPARK_HOME}
 COPY --from=build_container ${UNPACK_ROOT}${SPARK_UNPACK_SUBPATH}/ ${SPARK_HOME}
 
 RUN ls -la /scripts/admin
-COPY ./scripts/admin/spark_master /scripts/admin/spark_master
-RUN ls -la /scripts/admin && chmod -R u+x /scripts/admin/spark_master
+COPY ./scripts/admin /scripts/admin
+RUN ls -la /scripts/admin && chmod -R u+x /scripts/admin
 
 COPY ./conf/* ${SPARK_HOME}/conf

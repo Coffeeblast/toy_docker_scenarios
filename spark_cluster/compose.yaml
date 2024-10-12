@@ -11,8 +11,8 @@ services:
     deploy:
       replicas: 0
 
-  spark_master:
-    container_name: spark_master
+  spark_worker:
+    container_name: spark_worker
     depends_on:
       - hadoop
     build: 
@@ -33,13 +33,11 @@ services:
     image: "coffeeblast/spark_base_img:latest"
     networks: 
       - spark_cluster_network
-    ports:
-      # spark web ui port
-      - "8080:8080"
+    # ports:
+    #   - "8080:8080" # spark web ui port
     #entrypoint: ["/bin/bash", "-c", "${SPARK_HOME}/sbin/start-master.sh && tail -f /dev/null" ]
     #entrypoint: ["/bin/bash", "-c", "tail -f /dev/null" ]
-    entrypoint: ["/scripts/admin/spark_master/startup.sh"]
-
+    entrypoint: ["/scripts/admin/spark_worker/startup.sh"]
   hadoop:
     container_name: hadoop
     depends_on:
@@ -68,6 +66,23 @@ services:
     #entrypoint: ["/bin/bash", "-c", "/usr/sbin/sshd && sbin/start-dfs.sh && tail -f /dev/null" ]
     #entrypoint: ["/bin/bash", "-c", "/usr/sbin/sshd && tail -f /dev/null" ]
     entrypoint: ["/scripts/admin/hadoop/startup.sh"]
+
+  client_machine:
+    container_name: client_machine
+    depends_on:
+      - hadoop
+    build: 
+      context: ./client_machine
+      additional_contexts:
+        - spark=./spark
+      dockerfile: Dockerfile_client_machine
+      network: host
+    image: "coffeeblast/spark_cluster_client_machine:latest"
+    volumes:
+      - "./client_machine/scripts/app:/scripts/app:ro"
+    networks: 
+      - spark_cluster_network
+    entrypoint: ["/scripts/admin/client_machine/startup.sh" ]
 
 networks:
   spark_cluster_network:
