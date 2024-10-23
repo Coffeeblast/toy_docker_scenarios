@@ -1,3 +1,3 @@
 #!/bin/bash
-#/spark_conf/spark-env.sh
+/usr/sbin/sshd
 tail -f /dev/null

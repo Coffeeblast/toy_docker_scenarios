@@ -1,0 +1,19 @@
+services:
+  vscode_server:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      network: host
+    image: "coffeeblast/vscode_server:latest"
+    container_name: vscode_server
+    ports:
+      - 22:22
+    networks: 
+      - vscode_server_network
+    volumes:
+      - "./user_data:/home/somedude/user_data:rw"
+    entrypoint: [ "/scripts/entrypoint.sh" ]
+
+networks:
+  vscode_server_network:
+    name: vscode_server_network

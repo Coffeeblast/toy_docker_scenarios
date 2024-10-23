@@ -2,3 +2,8 @@
 downloads/cache/
 **/tmp_unpack/
 **/downloads/
+tmp_spark_cluster/
+tmp_spark_cluster_root/
+tmp_spark_cluster_root_distributed/
+vscode_server/ssh_keys/server_key/
+vscode_server/ssh_keys/user_key/
