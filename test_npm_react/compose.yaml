@@ -1,0 +1,24 @@
+services:
+  test_npm_react:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      network: host
+    image: "coffeeblast/test_npm_react:latest"
+    container_name: test_npm_react
+    # environment:
+    #   - SPARK_HOME=/usr/local/lib/python3.12/dist-packages/pyspark
+    #   - PYSPARK_PYTHON=python3.12
+    #   - PYSPARK_DRIVER_PYTHON=python3.12
+    ports:
+      - 22:22 # ssh port
+      - 5173:5173 # vite app port
+    networks: 
+      - test_npm_react_network
+    volumes:
+      - "./user_data:/home/somedude/user_data:rw"
+    entrypoint: [ "/scripts/entrypoint.sh" ]
+
+networks:
+  test_npm_react_network:
+    name: test_npm_react_network

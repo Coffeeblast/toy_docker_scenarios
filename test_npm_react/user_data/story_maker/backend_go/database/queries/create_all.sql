@@ -1,0 +1,5 @@
+CREATE TABLE stories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL
+    , name STRING
+    , author STRING
+)

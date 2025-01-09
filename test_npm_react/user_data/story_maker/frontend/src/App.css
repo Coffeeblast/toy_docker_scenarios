@@ -1,0 +1,17 @@
+table, td, th {
+  border: 1px solid;
+}
+
+td, th {
+  padding: 2px;
+}
+
+table {
+  /*width: 100%;*/
+  border-collapse: collapse;
+}
+
+div {
+  border: 2px solid rgb(106, 106, 211);
+  margin: 2px;
+}

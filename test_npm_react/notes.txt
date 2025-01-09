@@ -1,0 +1,2 @@
+https://code.visualstudio.com/docs/setup/linux
+https://www.devzero.io/blog/how-to-set-up-a-vs-code-server-for-working-remotely

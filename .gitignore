@@ -2,6 +2,10 @@
 downloads/cache/
 **/tmp_unpack/
 **/downloads/
-vscode_server/ssh_keys/server_key/
-vscode_server/ssh_keys/user_key/
 no_git/
+**/ssh_keys/
+**/.venv/
+**/*.svg
+**/__pycache__/
+**/node_modules/
+test_npm_react/user_data/story_maker/*/data/
