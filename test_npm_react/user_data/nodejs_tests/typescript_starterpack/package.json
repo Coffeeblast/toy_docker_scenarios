@@ -1,0 +1,12 @@
+{
+  "name": "typescript_starterpack",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npx tsc",
+    "start": "npm run build && node build/starterpack.js"
+  },
+  "author": "",
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

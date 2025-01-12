@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "start",
+			"path": "nodejs_tests/typescript_starterpack",
+			"problemMatcher": [],
+			"label": "npm: start - nodejs_tests/typescript_starterpack",
+			"detail": "npm run build && node build/starterpack.js",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
